@@ -3,3 +3,7 @@ hello_cargo
 variables
 Cargo.lock
 target
+functions
+branches
+loops
+rustlings
