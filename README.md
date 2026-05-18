@@ -15,3 +15,4 @@ Each project here is scoped to whatever concepts I'd just learned at the time of
 | Project | Concepts covered |
 | --- | --- |
 | [`d2c_unit_economics`](./d2c_unit_economics) | `let`, `const`, `mut`, shadowing, primitive types, tuples, type casting, formatted `println!` |
+| [`streak_analyzer`](./streak_analyzer) | functions, statements vs expressions, `if`-as-expression, `for` over ranges, `while`, mutable accumulators, arrays |
