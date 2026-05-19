@@ -36,4 +36,5 @@ fn print_heatmap(activity : [bool;14]) {
        counter+=1;
        print!("{}",icon);
     }
+    println!()
 }
