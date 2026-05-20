@@ -59,14 +59,14 @@ fn main(){
 
     const WICKET_COUNT : u32 = 5;
 
-    let (total_runs,run_rate) = calculate_runs_and_run_rate(team_1.clone(),team_2,team_1_runs);
+    let (total_runs,run_rate) = calculate_runs_and_run_rate(&team_1,team_2,team_1_runs);
 
-    let summary = final_summary(team_1,team_1_runs,total_runs,WICKET_COUNT,run_rate);
+    let summary = final_summary(&team_1,team_1_runs,total_runs,WICKET_COUNT,run_rate);
 
     println!("{}",summary);
 }
 
-fn calculate_runs_and_run_rate(team1: String, team2: String, team_1_runs : [u32;5]) -> (u32,f64) {
+fn calculate_runs_and_run_rate(team1: &str, team2: String, team_1_runs : [u32;5]) -> (u32,f64) {
     println!(">>> Innings: {0} vs {1}",team1,team2);
     let mut runs : u32 = 0;
     for run in team_1_runs {
@@ -77,9 +77,37 @@ fn calculate_runs_and_run_rate(team1: String, team2: String, team_1_runs : [u32;
     (runs,run_rate)    
 }
 
-fn final_summary(team : String, team_runs : [u32;5], total_runs : u32, wickets : u32, run_rate : f64) -> String{
+fn final_summary(team : &str, team_runs : [u32;5], total_runs : u32, wickets : u32, run_rate : f64) -> String{
     let total_overs = team_runs.len();
-    let s = format!("{team} posted {total_runs}/{wickets} in {total_overs} overs at RR {run_rate}");
-
-    s
+    format!("{team} posted {total_runs}/{wickets} in {total_overs} overs at RR {run_rate:.2}")
 }
+
+// fn main(){
+//     let s = String::from("Hello"); // string gets created
+//     let s_length :usize = calculate_length(&s); // function is passed a reference to the string not the string itself
+
+//     println!("The length of the string {} is : {}",s, s_length); //since only the reference was passed so string is still accessible after the function call
+// }
+
+
+// fn calculate_length(s : &String) -> usize{
+//     s.len() // the length of the string (reference) is returned
+// } // s goes out of scope here, but it doesnt own the string itself so it doesnt get dropped
+
+
+// fn main(){
+//     let mut s = String::from("Hello"); // string gets created (also declared as mutable as the reference to it is mutable)
+    
+//     let r2 = &mut s;
+//     println!("{}",r2); // mutable ref's usage ends here
+//     let r1 = &s; // no issue declaring immut here
+//     println!("{}",r1);
+//     append_string(&mut s); // function is passed a mutable reference to the string so it can be edited
+
+//     println!("The new version of the string is : {}",s); //since only the reference was passed so string is still accessible after the function call
+// }
+
+
+// fn append_string(s : &mut String){ //argument also typed as mutable reference
+//     s.push_str(", World!"); // the length of the string (reference) is returned
+// } // s goes out of scope here, but it doesnt own the string itself so it doesnt get dropped
