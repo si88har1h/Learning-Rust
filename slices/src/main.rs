@@ -1,16 +1,18 @@
 //Text Analyzer
 
 fn main() {
-    let s : String = String::from("the quick browned fox jumped");
+    let s : String = String::from("the quick brown fox jumped");
     let part = &s[..];
     let first_word = first_word(part);
     let last_word = last_word(part);
+    let longest_word = longest_word(part);
     let word_count = word_count(part);
 
 
-    println!("{}",first_word);
-    println!("{}",last_word);
-    println!("{}",word_count);
+    println!("First Word: {}",first_word);
+    println!("Last Word: {}",last_word);
+    println!("Longest Word: {}",longest_word);
+    println!("Word Count: {}",word_count);
 }
 
 fn first_word(s: &str) -> &str {
@@ -39,6 +41,27 @@ fn last_word(s: &str) -> &str {
     }
     &s[last_space+1 ..]
 }    
+
+fn longest_word(s: &str) -> &str {
+    let bytes = s.as_bytes();
+    let mut space = 0;
+    let mut longest_slice = "";
+
+    for (i,&item) in bytes.iter().enumerate() {
+        if item == b' '{
+            if s[space..i].trim().len() > longest_slice.len() {
+                longest_slice = s[space..i].trim();
+            }
+            space = i;
+        }
+    }
+
+    if s[space..].trim().len() > longest_slice.len(){
+        longest_slice = s[space..].trim();
+    }
+    
+    longest_slice
+} 
 
 fn word_count(s: &str) -> usize {
     let bytes = s.as_bytes();
