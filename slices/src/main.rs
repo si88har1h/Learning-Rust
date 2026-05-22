@@ -1,7 +1,7 @@
 //Text Analyzer
 
 fn main() {
-    let s : String = String::from("the quick brown fox jumped");
+    let s : String = String::from("k kkk kkkkk kkkkkkk kkkkkkkkk kkkkkkkkkk ");
     let part = &s[..];
     let first_word = first_word(part);
     let last_word = last_word(part);
@@ -64,20 +64,6 @@ fn longest_word(s: &str) -> &str {
 } 
 
 fn word_count(s: &str) -> usize {
-    let bytes = s.as_bytes();
-    let mut count = 0;
-    let mut space = 0;
-
-    for (i,&item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            count+=1;
-            space=i;
-        }
-    }
-    if s[space+1..].len() > 0 {
-        count+=1;
-    }
-
-    count
+    s.split_whitespace().count()
 }  
 
