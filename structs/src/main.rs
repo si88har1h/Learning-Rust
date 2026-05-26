@@ -10,6 +10,17 @@ impl Rectangle {
     fn area(&self) -> i32{
         self.length * self.breadth
     }
+
+    fn does_it_fit(&self, rect : &Rectangle) -> bool{
+        rect.length > self.length && rect.breadth > self.breadth
+    }
+
+    fn square(size : i32) -> Self {
+        Self {
+            length : size,
+            breadth : size
+        }
+    }
 }
 
 fn main() {
@@ -31,5 +42,7 @@ fn main() {
     
     let rectangle = Rectangle {length,breadth};
     dbg!(&rectangle);
+    let square = Rectangle::square(20);
+    dbg!(&square);
     println!("Area of the rectangle is : {}",rectangle.area());
 }

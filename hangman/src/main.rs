@@ -1,10 +1,7 @@
 mod constants;
 use crate::constants::*;
 use rand::Rng;
-use std::fmt::Write;
 use std::io;
-
-// data required for game : word bank, guesses(lives), letters guessed
 
 #[derive(Debug)]
 struct Game {
@@ -16,60 +13,85 @@ struct Game {
 impl Game {
     fn new(words: &[&str]) -> Self {
         Self {
-            secret: words[rand::thread_rng().gen_range(0..=words.len())].to_string(),
+            secret: words[rand::thread_rng().gen_range(0..words.len())].to_string(),
             guessed: [false; 26],
             wrong: 0,
         }
     }
-    // fn was_guessed(&self, letter: char) -> bool {
-    //     let letter_letter.to_ascii_lowercase() as usize - 'a' as usize;
-    //     for character in self.guessed {
-    //     }
-    //     true
-    // }
-    // fn guess(&mut self, letter: char) -> bool {}
-    // fn is_won(&self) -> bool {}
-    // fn is_lost(&self) -> bool {}
+
+    fn was_guessed(&self, letter: char) -> bool {
+        let letter_index = letter.to_ascii_lowercase() as usize - 'a' as usize;
+        self.guessed[letter_index]
+    }
+    fn guess(&mut self, letter: char) -> bool {
+        let letter_index = letter.to_ascii_lowercase() as usize - 'a' as usize;
+        for character in self.secret.chars() {
+            self.guessed[letter_index] = true;
+            if character.to_ascii_lowercase() == letter {
+                return self.guessed[letter_index];
+            }
+        }
+        false
+    }
+    fn is_won(&self) -> bool {
+        self.secret.chars().all(|letter| {
+            let index = (letter.to_ascii_lowercase() as usize) - ('a' as usize);
+            self.guessed[index]
+        })
+    }
+    fn is_lost(&self) -> bool {
+        self.wrong >= 6
+    }
     fn render(&self) -> String {
         let mut result = String::new();
         for letter in self.secret.chars() {
-            let i = (letter as u8 - b'a') as usize;
+            let i = (letter.to_ascii_lowercase() as u8 - b'a') as usize;
             if self.guessed[i] {
-                write!(result, "{} ", letter);
+                result.push(letter);
             } else {
-                write!(result, "{}", "_ ");
+                result.push('_');
             }
+            result.push(' ');
         }
-
         result
     }
     fn gallows(&self) -> &'static str {
         match self.wrong {
-            0 => &STAGE_0,
-            1 => &STAGE_1,
-            2 => &STAGE_2,
-            3 => &STAGE_3,
-            4 => &STAGE_4,
-            5 => &STAGE_5,
-            6 => &STAGE_6,
+            0 => STAGE_0,
+            1 => STAGE_1,
+            2 => STAGE_2,
+            3 => STAGE_3,
+            4 => STAGE_4,
+            5 => STAGE_5,
+            6 => STAGE_6,
             _ => "nothing",
         }
     }
 }
 
 fn main() {
-    let game = Game::new(&WORDS);
-    dbg!(&game);
+    let mut game = Game::new(&WORDS);
 
     loop {
         println!("{}", game.gallows());
         println!("Word :    {}\n", game.render());
         println!("Wrong:    {}/6", game.wrong);
 
+        if game.is_lost() {
+            println!(
+                "You ran out of wrong guesses! You lost! The word was {0}",
+                game.secret
+            );
+            break;
+        } else if game.is_won() {
+            println!("You guessed the word! You won!");
+            break;
+        }
+
         let mut guessed_letter = String::new();
         let valid_letter: char = loop {
             guessed_letter.clear();
-            print!("Enter a letter:    ");
+            println!("Enter a letter:    ");
             io::stdin()
                 .read_line(&mut guessed_letter)
                 .expect("Failure to read the guessed letter");
@@ -79,7 +101,7 @@ fn main() {
             if trimmed_letter.chars().count() == 1 {
                 let letter = trimmed_letter.chars().next().unwrap();
 
-                if letter.is_alphabetic() {
+                if letter.is_ascii_alphabetic() {
                     break letter;
                 }
             }
@@ -87,9 +109,16 @@ fn main() {
             println!("This is not a valid letter. Try Again!");
         };
 
-        println!("{}", &guessed_letter);
-        println!("{}", game.was_guessed('a'));
-
-        break;
+        if game.was_guessed(valid_letter) {
+            println!("This letter is guessed already, Try another one!");
+            continue;
+        } else {
+            let valid_guess = game.guess(valid_letter);
+            if !valid_guess {
+                println!("Wrong Guess!");
+                game.wrong += 1;
+                continue;
+            }
+        }
     }
 }
