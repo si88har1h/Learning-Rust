@@ -10,6 +10,12 @@ struct Game {
     wrong: u32,
 }
 
+enum GuessResult {
+    AlreadyGuessed,
+    Hit,
+    Miss,
+}
+
 impl Game {
     fn new(words: &[&str]) -> Self {
         Self {
@@ -19,20 +25,20 @@ impl Game {
         }
     }
 
-    fn was_guessed(&self, letter: char) -> bool {
+    fn guess(&mut self, letter: char) -> GuessResult {
         let letter_index = letter.to_ascii_lowercase() as usize - 'a' as usize;
-        self.guessed[letter_index]
-    }
-    fn guess(&mut self, letter: char) -> bool {
-        let letter_index = letter.to_ascii_lowercase() as usize - 'a' as usize;
+        if self.guessed[letter_index] {
+            return GuessResult::AlreadyGuessed;
+        }
         for character in self.secret.chars() {
             self.guessed[letter_index] = true;
-            if character.to_ascii_lowercase() == letter {
-                return self.guessed[letter_index];
+            if character.eq_ignore_ascii_case(&letter) {
+                return GuessResult::Hit;
             }
         }
-        false
+        GuessResult::Miss
     }
+
     fn is_won(&self) -> bool {
         self.secret.chars().all(|letter| {
             let index = (letter.to_ascii_lowercase() as usize) - ('a' as usize);
@@ -109,12 +115,16 @@ fn main() {
             println!("This is not a valid letter. Try Again!");
         };
 
-        if game.was_guessed(valid_letter) {
-            println!("This letter is guessed already, Try another one!");
-            continue;
-        } else {
-            let valid_guess = game.guess(valid_letter);
-            if !valid_guess {
+
+        match game.guess(valid_letter) {
+            GuessResult::AlreadyGuessed => {
+                println!("This letter is guessed already, Try another one!");
+                continue;
+            }
+            GuessResult::Hit => {
+                println!("Good Guess!")
+            }
+            GuessResult::Miss => {
                 println!("Wrong Guess!");
                 game.wrong += 1;
                 continue;
