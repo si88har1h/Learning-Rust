@@ -12,10 +12,16 @@ enum Cell {
     O,
 }
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq)]
 enum Player {
     X,
     O,
+}
+
+#[derive(Debug)]
+struct Score {
+    player_x : u32,
+    player_o : u32,
 }
 
 impl Player {
@@ -31,6 +37,7 @@ impl Player {
 struct Board {
     cells: [[Cell; 3]; 3],
     current_player: Player,
+    score : Score,
 }
 
 use std::io;
@@ -38,6 +45,11 @@ use std::io;
 impl Board {
     fn render(&self) {
         println!("\\\\---------------- Tic - Tac - Toe -------------//\n\n");
+        println!("XOXOOXOX------- Score Card -------XOXOXOX");
+
+        println!("X : {}",self.score.player_x);
+        println!("O : {}",self.score.player_o);
+
         for (i, row) in self.cells.iter().enumerate() {
             for (j, cell) in row.iter().enumerate() {
                 match cell {
@@ -80,10 +92,19 @@ impl Board {
         }
     }
 
+    fn reset_board(&mut self){
+        self.cells = [
+            [Cell::Empty, Cell::Empty, Cell::Empty],
+            [Cell::Empty, Cell::Empty, Cell::Empty],
+            [Cell::Empty, Cell::Empty, Cell::Empty],
+        ];
+        self.current_player = Player::X;
+    }
+
     fn check_state(&self) -> GameState {
         //check win
         if Self::check_win(&self.cells, &self.current_player) {
-            return GameState::Win(self.current_player.other().clone());
+            return GameState::Win(self.current_player.other());
         }
 
         // checks if the game is still ongoing
@@ -155,6 +176,10 @@ fn main() {
             [Cell::Empty, Cell::Empty, Cell::Empty],
         ],
         current_player: Player::X,
+        score : Score {
+            player_x : 0,
+            player_o : 0,
+        }
     };
 
     'game: loop {
@@ -200,11 +225,17 @@ fn main() {
             }
             GameState::Win(winner) => {
                 println!("Game is won by {0:?}",winner);
-                break 'game;
+                match winner {
+                Player::X => board.score.player_x += 1,
+                Player::O => board.score.player_o += 1,
+            }
+                board.reset_board();
+                continue;
             }
             GameState::Tie => {
                 println!("Game is tied between {0:?} and {1:?}",board.current_player,board.current_player.other());
-                break 'game;
+                board.reset_board();
+                continue;
             }
         }
     }
